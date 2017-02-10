@@ -69,9 +69,11 @@ node promise.js
 ```
 
 Mẫu dữ liệu [a, b, c] truyền vào:
+
 1. [1, 1, 1]: báo lỗi không vẽ được do đồ thị vô nghiệm
-2. [1, 10, 7]
-3. [-1, ]
+2. [1, 10, 7]: có nghiệm vẽ được đồ thị
+3. [-1, 10, 7]: đồ thị úp ngược lại
+
 ## Dùng hay không dùng Promise
 
 Có 2 ví dụ: promise.js và nopromise.js
