@@ -21,7 +21,7 @@ npm init
 npm install --save chai express body-parser nunjucks plotly.js
 ```
 
-### Tạo một file nopromise.js
+### Tạo server express sử dụng template engine Nunjucks đơn giản nhất
 ```javascript
 const express = require('express');
 const app = express();
