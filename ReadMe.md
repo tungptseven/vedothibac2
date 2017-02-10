@@ -15,10 +15,10 @@ lai nếu đổi thư viện vẽ đồ thị, thì chúng ta chỉ phải chỉ
 
 # Các bước thực hiện
 
-### Cài đặt các Ndoe module cần thiết
+### Cài đặt các Node module cần thiết của ví dụ này
 ```bash
 npm init
-npm install --save chai express body-parser nunjucks plotly.js
+npm install --save chai express body-parser nunjucks plotly fs
 ```
 
 ### Tạo server express sử dụng template engine Nunjucks đơn giản nhất
@@ -64,6 +64,9 @@ Sau đó chỉnh sửa entry script start ở package.json
 
 ## Chạy thử ứng dụng
 ```bash
+git clone https://github.com/TechMaster/vedothibac2.git
+cd vedothibac2
+npm install
 node nopromise.js
 node promise.js
 ```
