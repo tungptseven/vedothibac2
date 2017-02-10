@@ -42,8 +42,9 @@ app.get('/', (req, res) => {
 app.post('/', (req, res) => {
   try {
     [a, b, c] = math.validate_abc(req.body.a, req.body.b, req.body.c);
+    //Nhìn có vẻ đơn giản nhưng chạy không đúng. Mỗi lần tạo ảnh, phải refresh lại trang chủ
     renderChart(a, b, c);
-    res.render('index.html', {'a': a, 'b': b, 'c': c});
+    res.render('index.html', {'a': a, 'b': b, 'c': c});  //trả về ngay mà không chờ kết quả ảnh đã tạo xong chưa
   } catch (err) {
     res.send(`Error: ${err.message}`);
   }
@@ -54,7 +55,7 @@ app.listen(8080, () => {
 });
 
 function renderChart(a, b, c) {
-  let x_seriesy_series;
+  let x_series, y_series;
   try {
     [x_series, y_series] = math.gendata(a, b, c);
   } catch (err) {

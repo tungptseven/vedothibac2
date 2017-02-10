@@ -67,9 +67,16 @@ exports.findY = findY;
 exports.gendata = (a,b,c) => {
 
   let [x1, x2] = findX(a, b, c);
+  if (x1 > x2) {
+    let temp = x1;
+    x1 = x2;
+    x2 = temp;
+  }
+  console.log('x1 = ', x1, ', x2 = ', x2);
   let margin = 5.0;
   let step = 0.1;
   let [X1, X2] = [x1 - margin, x2 + margin];
+
   let xseries = [];
   let yseries = [];
   let x = X1;

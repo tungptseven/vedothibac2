@@ -21,7 +21,7 @@ npm init
 npm install --save chai express body-parser nunjucks plotly.js
 ```
 
-### Tạo một file index.js
+### Tạo một file nopromise.js
 ```javascript
 const express = require('express');
 const app = express();
@@ -60,42 +60,81 @@ app.listen(8080, () => {
 });
 ```
 Sau đó chỉnh sửa entry script start ở package.json
-```"start": "node index.js"```
+```"start": "node nopromise.js"```
 
-### Sử dụng plotly 
+## Chạy thử ứng dụng
+```bash
+node nopromise.js
+node promise.js
+```
 
-### Blocking
-Hàm này chạy local từng tác vụ đơn lẻ thì được, chạy trên server lỗi
+Mẫu dữ liệu [a, b, c] truyền vào:
+1. [1, 1, 1]: báo lỗi không vẽ được do đồ thị vô nghiệm
+2. [1, 10, 7]
+3. [-1, ]
+## Dùng hay không dùng Promise
+
+Có 2 ví dụ: promise.js và nopromise.js
+
+## nopromise.js
+```javascript
+app.post('/', (req, res) => {
+  try {
+    [a, b, c] = math.validate_abc(req.body.a, req.body.b, req.body.c);    
+    renderChart(a, b, c);
+    res.render('index.html', {'a': a, 'b': b, 'c': c});  //trả về ngay mà không chờ kết quả ảnh đã tạo xong chưa
+  } catch (err) {
+    res.send(`Error: ${err.message}`);
+  }
+});
+```
+
+Ở đây renderChart là hàm asynchronous, nếu res.render không đợi kết quả nó trả về thì server trả về trang web ngay mà 
+không quan tâm đồ thị đã được sinh xong hay chưa.
+
+### promise.js
+Trong renderChart tạo ra một Promise. Khi nào đồ thị tạo xong thì resolve(), báo hoàn tất. Lúc này mới trả về trang web.
+Trang web render sẽ đờ đẫn khi biểu đồ phức tạp, mất nhiều thời gian để vẽ.
+
+Để xử lý vấn đề này, hãy sử dụng kỹ thuật AJAX
+
 ```javascript
 function renderChart(a, b, c) {
-  let x_seriesy_series;
-  try {
-    [x_series, y_series] = math.gendata(a, b, c);
-  } catch (err) {
-    throw new Error('failed to generate data series');
-  }
+  return new Promise((resolve, reject) => {
+    let x_series, y_series;
+    try {
+      [x_series, y_series] = math.gendata(a, b, c);
+    } catch (err) {
+      reject(`math.gendata failed: ${err}`);
+    }
 
-  let trace = {
-    x: x_series,
-    y: y_series,
-    type: "scatter"
-  };
+    let trace = {
+      x: x_series,
+      y: y_series,
+      type: "scatter"
+    };
 
-  let figure = {'data': [trace]};
+    let figure = {'data': [trace]};
 
-  let imgOpts = {
-    format: 'png',
-    width: 1000,
-    height: 500
-  };
+    let imgOpts = {
+      format: 'png',
+      width: 1000,
+      height: 500
+    };
 
-  plotly.getImage(figure, imgOpts, function (error, imageStream) {
-    if (error) return console.log(error);
 
-    let filePath = __dirname.concat('/public/1.png');
+    plotly.getImage(figure, imgOpts, function (error, imageStream) {
+      if (error) {
+        reject(`plotly.getImage failed: ${error}`);
+      }
 
-    let fileStream = fs.createWriteStream(filePath);
-    imageStream.pipe(fileStream);
+      let filePath = __dirname.concat('/public/1.png');
+
+      let fileStream = fs.createWriteStream(filePath);
+      imageStream.pipe(fileStream);
+      resolve();
+    });
+
   });
 }
 ```
