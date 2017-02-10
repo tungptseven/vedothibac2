@@ -35,17 +35,17 @@ app.engine('html', nunjucks.render);
 app.set('view engine', 'html');
 
 app.get('/', (req, res) => {
-  res.render('index.html');
+  res.render('index.html', {'a': 2, 'b': -10, 'c': 7});
 });
 
 
 app.post('/', (req, res) => {
   try {
-    [a, b, c] = [parseFloat(req.body.a), parseFloat(req.body.b), parseFloat(req.body.c)];
+    [a, b, c] = math.validate_abc(req.body.a, req.body.b, req.body.c);
     renderChart(a, b, c);
-    res.render('index.html');
+    res.render('index.html', {'a': a, 'b': b, 'c': c});
   } catch (err) {
-    res.send(err);
+    res.send(`Error: ${err.message}`);
   }
 });
 
