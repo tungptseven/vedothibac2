@@ -86,5 +86,5 @@ exports.gendata = (a,b,c) => {
     x += step;
   }
 
-  return [xseries, yseries];
+  return [xseries, yseries,x1,x2];
 };
