@@ -1,3 +1,6 @@
+/**
+ * Created by techmaster on 2/11/17.
+ */
 const express = require('express');
 const app = express();
 const nunjucks = require('nunjucks');
@@ -6,7 +9,7 @@ const plotly = require('plotly')('tungpt7', 'nMEIrgmKOzhOs7WjNBdw');
 const fs = require('fs');
 const math = require('./math/hambac2');
 const path = require('path');
-
+const shortid = require('shortid');
 const Promise = require('bluebird');
 
 //Cấu hình nunjucks
@@ -33,11 +36,15 @@ app.engine('html', nunjucks.render);
 app.set('view engine', 'html');
 
 app.get('/', (req, res) => {
-  res.render('index.html', {'a': 2, 'b': -10, 'c': 7});
+  res.render('index2.html', {'a': 2, 'b': -10, 'c': 7});
 });
 
-
-app.post('/', (req, res) => {
+/***
+ * Hàm hứng post request sử dụng kỹ thuật async - await. Để chạy thử node --harmony-async-await asynawait.js
+ * app.post('/', async(req, res) => {...}
+ * filePath = await renderChart(a, b, c);
+ */
+app.post('/', async(req, res) => {
   try {
     [a, b, c] = math.validate_abc(req.body.a, req.body.b, req.body.c);
   } catch (err) {
@@ -45,20 +52,17 @@ app.post('/', (req, res) => {
     return;
   }
 
-  renderChart(a, b, c)
-    .then(() => {
-      //Nếu thành công thì render. Khác với trước đấy là res.render chạy luôn mà không chờ ảnh trả về
-      res.render('index.html', {'a': a, 'b': b, 'c': c});
-    })
-    .catch((err) => {
-      res.send(`Error Render Chat: ${err}`);
-    });
-
+  try {
+    filePath = await renderChart(a, b, c);
+    res.render('index2.html', {'a': a, 'b': b, 'c': c, 'filePath': filePath});
+  } catch (err) {
+    res.send(`Error Render Chat: ${err}`);
+  }
 
 });
 
-app.listen(4000, () => {
-  console.log('Web app promise style listens at port 4000');
+app.listen(5000, () => {
+  console.log('Web app async-await listens at port 5000');
 });
 
 /***
@@ -96,11 +100,14 @@ function renderChart(a, b, c) {
         reject(`plotly.getImage failed: ${error}`);
       }
 
-      let filePath = __dirname.concat('/public/1.png');
+      let uniqueid = shortid.generate();
+      let filePath = `/public/${uniqueid}.png`;
+      let fullfilePath = __dirname.concat(filePath);
+      console.log(fullfilePath);
 
-      let fileStream = fs.createWriteStream(filePath);
+      let fileStream = fs.createWriteStream(fullfilePath);
       imageStream.pipe(fileStream);
-      resolve();
+      resolve(filePath);
     });
 
   });

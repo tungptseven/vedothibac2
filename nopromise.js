@@ -50,8 +50,8 @@ app.post('/', (req, res) => {
   }
 });
 
-app.listen(8080, () => {
-  console.log('Web app listens at port 8080');
+app.listen(3000, () => {
+  console.log('Web app no-promise style listens at port 3000');
 });
 
 function renderChart(a, b, c) {

@@ -1,16 +1,22 @@
 # Hướng dẫn bài vẽ đồ thị bậc 2
 
+Tác giả Trịnh Minh Cường, bài giảng trong khóa học [Full Stack Node.js 2017](https://techmaster.vn/khoa-hoc/25544/full-stack-nodejs-2017)
+
 ### Bài này gồm có 3 bước:
 1. Người dùng nhập vào 3 giá trị a, b, c của hàm ```y = f(x) = a.x^2 + b.x + c``` ấn nút submit
 2. Tính nghiệm x1 và x2
-3. Vẽ đồ thị
+3. Vẽ đồ thị theo các kỹ thuật khác nhau: không dùng promise, dùng promise, dùng async-await
 
+### Các kỹ thuật demo
+- BlueBird Promise, xem [promise.js](https://github.com/TechMaster/vedothibac2/blob/master/promise.js)
+- Asyc Await trong ES7, xem [asynawait.js](https://github.com/TechMaster/vedothibac2/blob/master/asynawait.js)
+- Viết gulp file để start ứng dụng tự động [gulpfile.js](https://github.com/TechMaster/vedothibac2/blob/master/gulpfile.js)
 
 ### Yêu cầu khi làm bài này cần:
 1. Sử dụng pattern SOLID, tách phần tính nghiệm, và sinh dữ liệu ra khỏi phần đồ thị để trong tương
 lai nếu đổi thư viện vẽ đồ thị, thì chúng ta chỉ phải chỉnh sửa ít nhất
 
-2. Nếu đã tách được thì sẽ phải kiểm thử được.
+2. Nếu đã tách bách được các module, thành phần thì sẽ kiểm thử sẽ rất dễ dàng
 
 
 # Các bước thực hiện
@@ -63,19 +69,33 @@ Sau đó chỉnh sửa entry script start ở package.json
 ```"start": "node nopromise.js"```
 
 ## Chạy thử ứng dụng
+
 ```bash
 git clone https://github.com/TechMaster/vedothibac2.git
 cd vedothibac2
 npm install
 node nopromise.js
 node promise.js
+node --harmony-async-await asynwait.js
 ```
+Sử dụng browser để truy cập:
 
-Mẫu dữ liệu [a, b, c] truyền vào:
+- nopromise.js hứng ở cổng 3000, http://localhost:3000
+- promise.js hứng ở cổng 4000, http://localhost:4000
+- asynawait.js hứng ở cổng 5000, http://localhost:5000. _Chú ý phải có option --harmony-async-await khi dùng node chạy.
+
+### Sử dụng gulp chạy tự động
+Thay vì gõ lệnh Node để khởi động 3 web server ta viết code khởi động vào [gulpfile.js](https://github.com/TechMaster/vedothibac2/blob/master/gulpfile.js) sau đó chạy lệnh gulp
+Để chạy gulp cần cài thêm các module gulp, gulp-util, child_process
+gulp tiết kiệm rất nhiều thời gian gõ lệnh terminal.
+
+### Mẫu dữ liệu [a, b, c] truyền vào:
 
 1. [1, 1, 1]: báo lỗi không vẽ được do đồ thị vô nghiệm
 2. [1, 10, 7]: có nghiệm vẽ được đồ thị
 3. [-1, 10, 7]: đồ thị úp ngược lại
+4. [2, 0, 0]: đáy đồ thị ở gốc [0.0, 0.0]
+
 
 ## Dùng hay không dùng Promise
 
@@ -143,3 +163,11 @@ function renderChart(a, b, c) {
   });
 }
 ```
+
+## Async Await
+Trong Node.js 7.x, async await chỉ là tính năng thử nghiệm phải có option --harmony-async-await khi chạy. Tháng 4/2017, bản Node.js 8.x async-await sẽ được sử dụng 
+chính thức.
+
+async await giúp viết code dễ hiểu hơn một chút so với Promise.then. Nếu callback thì hàm xử lý kết quả lồng nhau (nest call back).
+Với Promise thì hàm xử lý lại nối chuỗi .then().then().then().
+Còn async await viết hàm async nhưng phong cách tuần tự từng dòng lệnh như là viết hàm sync.
